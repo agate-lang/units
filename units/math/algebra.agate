@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Algebra
+
+import "math/algebra/mat" for Mat2, Mat3, Mat
+import "math/algebra/vec" for Vec2, Vec3, Vec

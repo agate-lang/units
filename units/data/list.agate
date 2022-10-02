@@ -1,0 +1,69 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Doubly-linked list
+
+class __ListNode {
+  construct new(prev, next, data) {
+    @prev = prev
+    @next = next
+    @data = data
+  }
+  __prev { @prev }
+  __prev=(node) { @prev = node }
+  __next { @next }
+  __next=(node) { @next = node }
+  __data { @data }
+  __data=(data) { @data = data }
+}
+
+class List is Sequence {
+  construct new() {
+    @head = nil
+    @tail = nil
+  }
+
+  append(data) {
+    def node = __ListNode.new(@tail, nil, data)
+    @tail = node
+    if (@head == nil) {
+      @head = node
+    }
+  }
+
+  prepend(data) {
+    def node = __ListNode.new(nil, @head, data)
+    @head = node
+    if (@tail == nil) {
+      @tail = node
+    }
+  }
+
+  iterate(iterator) {
+    if (iterator == nil) {
+      return @head
+    }
+    assert(iterator is __ListNode)
+    return iterator.__next
+  }
+
+  iterator_value(iterator) {
+    assert(iterator is __ListNode)
+    return iterator.__data
+  }
+
+  __remove_node(node) {
+    assert(iterator is __ListNode)
+    if (node.__prev != nil) {
+      node.__prev.__next = node.__next
+    } else {
+      @head = node.__next
+    }
+    if (node.__next != nil) {
+      node.__next.__prev = node.__prev
+    } else {
+      @tail = node.__prev
+    }
+  }
+
+}

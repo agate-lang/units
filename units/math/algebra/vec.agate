@@ -1,0 +1,120 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Vectors
+
+class Vec2 {
+  construct new() {
+    @x = @y = 0.0
+  }
+
+  construct new(x, y) {
+    @x = x
+    @y = y
+  }
+
+  x { @x }
+  x=(val) { @x = val }
+  y { @y }
+  y=(val) { @y = val }
+
+  [index] { Object.field(this, index) }
+  [index]=(value) { Object.field(this, index, value) }
+
+  + { this }
+  - { Vec2.new(-@x, -@y) }
+
+  +(other) { Vec2.new(@x + other.x, @y + other.y) }
+  -(other) { Vec2.new(@x - other.x, @y - other.y) }
+  *(other) { Vec2.new(@x * other.x, @y * other.y) }
+  /(other) { Vec2.new(@x / other.x, @y / other.y) }
+  ==(other) { @x == other.x && @y == other.y }
+  !=(other) { @x != other.x || @y != other.y }
+
+  static dot(lhs, rhs) { lhs.x * rhs.x + lhs.y * rhs.y }
+}
+
+class Vec3 {
+  construct new() {
+    @x = @y = @z = 0.0
+  }
+
+  construct new(x, y, z) {
+    @x = x
+    @y = y
+    @z = z
+  }
+
+  x { @x }
+  x=(val) { @x = val }
+  y { @y }
+  y=(val) { @y = val }
+  z { @z }
+  z=(val) { @z = val }
+
+  [index] { Object.field(this, index) }
+  [index]=(value) { Object.field(this, index, value) }
+
+  + { this }
+  - { Vec3.new(-@x, -@y, -@z) }
+
+  +(other) { Vec3.new(@x + other.x, @y + other.y, @z + other.z) }
+  -(other) { Vec3.new(@x - other.x, @y - other.y, @z - other.z) }
+  *(other) { Vec3.new(@x * other.x, @y * other.y, @z * other.z) }
+  /(other) { Vec3.new(@x / other.x, @y / other.y, @z / other.z) }
+  ==(other) { @x == other.x && @y == other.y && @z == other.z }
+  !=(other) { @x != other.x || @y != other.y || @z != other.z }
+
+  static dot(lhs, rhs) { lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z }
+}
+
+class Vec {
+  construct new(size) {
+    assert(size > 0, "Vec must have a positive size")
+    @data = Array.new(size, 0.0)
+  }
+
+  [index] { @data[index] }
+  [index]=(value) { @data[index] = value }
+
+  + { this }
+  - {
+    def size = @data.size
+    def res = Vec.new(size)
+    for (i in 0...size) {
+      res[i] = -@data[i]
+    }
+    return res
+  }
+
+  +(other) { __operator(other, Fn.new {|a, b| a + b }) }
+  -(other) { __operator(other, Fn.new {|a, b| a - b }) }
+  *(other) { __operator(other, Fn.new {|a, b| a * b }) }
+  /(other) { __operator(other, Fn.new {|a, b| a / b }) }
+
+  ==(other) {
+    for (i in 0...size) {
+      if (@data[i] != other[i]) {
+        return false;
+      }
+    }
+    return true
+  }
+  !=(other) { !(this == other) }
+
+  __operator(other, binop) {
+    def size = @data.size
+    assert(other.size == size, "Other must have the same sime")
+    def res = Vec.new(size)
+    if (other is Float) {
+      for (i in 0...size) {
+        res[i] = binop(@data[i], other)
+      }
+    } else {
+      for (i in 0...size) {
+        res[i] = binop(@data[i], other[i])
+      }
+    }
+    return res;
+  }
+}

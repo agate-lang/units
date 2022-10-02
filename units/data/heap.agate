@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Heap, PriorityQueue
+
+class Heap {
+  construct new() {
+    @data = []
+    @comp = Fn.new {|a,b| a < b }
+  }
+
+  construct new(comp) {
+    @data = []
+    @comp = comp
+  }
+
+  empty { @data.empty }
+  size { @data.size }
+
+  top { @data[0] }
+
+  push(item) {
+    def i = @data.size
+    @data.append(item)
+    while (i > 0) {
+      def j = (i - 1) / 2
+      if (@comp(@data[j], @data[i]) {
+        return
+      }
+      @data.swap(i, j)
+      i = j
+    }
+  }
+
+  pop() {
+    @data[0] = @data[-1]
+    def max = (@data.size - 1) / 2
+    def i = 0
+    while (i < max) {
+      def lt = 2 * i + 1
+      def rt = 2 * i + 2
+      if (@comp(@data[i], @data[lt]) && @comp(@data[i], @data[rt])) {
+        return
+      }
+      def j = @comp(@data[lt], @data[rt]) ? lt : rt
+      @data.swap(i, j)
+      i = j
+    }
+    @data.erase(-1)
+  }
+
+  iterate(iterator) { @data.iterate(iterator) }
+  iterator_value(iterator) { @data.iterator_value(iterator) }
+
+  to_a { @data[0..-1] }
+
+  static sort(seq, comp) {
+    def h = Heap.new {|a,b| !comp(a,b) }
+    for (item in seq) {
+      h.push(item)
+    }
+    def res = []
+    while (!h.empty) {
+      res.append(h.top)
+      h.pop()
+    }
+    return res
+  }
+}
+
+class PriorityQueue is Heap {
+  construct new() { super() }
+  construct new(comp) { super(comp) }
+}

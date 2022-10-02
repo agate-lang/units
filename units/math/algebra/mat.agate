@@ -1,0 +1,39 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Matrices
+
+class Mat2 {
+  construct new() {
+    @m00 = @m01 = @m10 = @m11 = 0.0
+  }
+
+  [row, col] { Object.field(this, .__linearize(row, col)) }
+  [row, col]=(value) { Object.field(this, .__linearize(row, col), value) }
+
+  __linearize(row, col) { row * 2 + col }
+}
+
+class Mat3 {
+  construct new() {
+    @m00 = @m01 = @m02 = @m10 = @m11 = @m12 = @m20 = @m21 = @m22 = 0.0
+  }
+
+  [row, col] { Object.field(this, .__linearize(row, col)) }
+  [row, col]=(value) { Object.field(this, .__linearize(row, col), value) }
+
+  __linearize(row, col) { row * 3 + col }
+}
+
+class Mat {
+  construct new(rows, cols) {
+    @data = Array.new(rows * cols, 0.0)
+    @rows = rows
+    @cols = cols
+  }
+
+  [row, col] { @data[.__linearize(row, col)] }
+  [row, col]=(value) { @data[.__linearize(row, col)] = value }
+
+  __linearize(row, col) { row * @cols + col }
+}

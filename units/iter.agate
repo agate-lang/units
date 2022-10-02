@@ -1,0 +1,52 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Iter
+
+class __ZipSequence {
+  construct new(seq1, seq2) {
+    @all = [ seq1, seq2 ]
+  }
+
+  iterate(iterator) {
+    if (iterator == nil) {
+      iterator = []
+      for (i in 0...@all.size) {
+        def it = @all[i].iterate(nil)
+        if (it == nil) {
+          return nil
+        }
+        iterator.append(it)
+      }
+
+      return iterator
+    }
+
+    assert(iterator is Array, "Invalid iterator")
+    assert(iterator.size == @all.size, "Invalid iterator")
+
+    for (i in 0...@all.size) {
+      def it = @all[i].iterate(iterator[i])
+      if (it == nil) {
+        return nil
+      }
+      iterator[i] = it
+    }
+    return iterator
+  }
+
+  iterator_value(iterator) {
+    assert(iterator is Array)
+    assert(iterator.size == @all.size)
+    def value = []
+    for (i in 0...@all.size) {
+      value.append(@all[i].iterator_value(iterator[i]))
+    }
+    return value
+  }
+
+}
+
+class Iter {
+  static zip(seq1, seq2) { __ZipSequence.new(seq1, seq2) }
+}
