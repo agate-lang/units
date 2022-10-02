@@ -24,7 +24,7 @@ class Heap {
     @data.append(item)
     while (i > 0) {
       def j = (i - 1) / 2
-      if (@comp(@data[j], @data[i]) {
+      if (@comp(@data[j], @data[i])) {
         return
       }
       @data.swap(i, j)

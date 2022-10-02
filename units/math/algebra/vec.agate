@@ -87,15 +87,15 @@ class Vec {
     return res
   }
 
-  +(other) { __operator(other, Fn.new {|a, b| a + b }) }
-  -(other) { __operator(other, Fn.new {|a, b| a - b }) }
-  *(other) { __operator(other, Fn.new {|a, b| a * b }) }
-  /(other) { __operator(other, Fn.new {|a, b| a / b }) }
+  +(other) { .__operator(other, Fn.new {|a, b| a + b }) }
+  -(other) { .__operator(other, Fn.new {|a, b| a - b }) }
+  *(other) { .__operator(other, Fn.new {|a, b| a * b }) }
+  /(other) { .__operator(other, Fn.new {|a, b| a / b }) }
 
   ==(other) {
-    for (i in 0...size) {
+    for (i in 0...@data.size) {
       if (@data[i] != other[i]) {
-        return false;
+        return false
       }
     }
     return true
@@ -115,6 +115,6 @@ class Vec {
         res[i] = binop(@data[i], other[i])
       }
     }
-    return res;
+    return res
   }
 }
