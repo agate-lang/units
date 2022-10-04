@@ -1,0 +1,6 @@
+import "tests/data/heap.test"
+import "tests/math/big.test"
+
+import "test" for TestSuite, ConsoleReporter
+
+TestSuite.run_all_tests(ConsoleReporter.new())

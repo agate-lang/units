@@ -1,0 +1,44 @@
+import "test/case" for TestCase
+
+class TestSuite {
+  construct new(name, fn) {
+    @name = name
+    @cases = []
+    fn(this)
+
+    if (@@suites == nil) {
+      @@suites = [ this ]
+    } else {
+      @@suites.append(this)
+    }
+  }
+
+  run(reporter) {
+    reporter.suite_begin(@name, @cases.size)
+    for (case in @cases) {
+      case.run(reporter)
+    }
+    reporter.suite_end()
+  }
+
+  case(name, fn) {
+    @cases.append(TestCase.new(name, fn))
+  }
+
+  cases { @cases }
+
+  static run_all_tests(reporter) {
+    def cases = 0
+
+    for (suite in @@suites) {
+      cases = cases + suite.cases.size
+    }
+
+    reporter.run_begin(@@suites.size, cases)
+    for (suite in @@suites) {
+      suite.run(reporter)
+    }
+    reporter.run_end()
+  }
+
+}

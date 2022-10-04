@@ -1,0 +1,4 @@
+import "test/case" for TestCase
+import "test/reporter" for ConsoleReporter
+import "test/result" for TestResult
+import "test/suite" for TestSuite

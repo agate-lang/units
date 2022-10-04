@@ -1,0 +1,18 @@
+import "data/heap" for Heap
+import "test" for TestSuite
+
+TestSuite.new("Heap") {|suite|
+  suite.case("NewEmpty") {|case|
+    def h = Heap.new()
+    case.expect_true(h.empty)
+    case.expect_equals(h.size, 0)
+  }
+
+  suite.case("PushOneElement") {|case|
+    def h = Heap.new()
+    h.push(42)
+    case.expect_false(h.empty)
+    case.expect_equals(h.size, 1)
+    case.expect_equals(h.top, 42)
+  }
+}

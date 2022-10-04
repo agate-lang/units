@@ -1,0 +1,41 @@
+import "test/result" for TestResult
+
+class TestCase {
+  construct new(name, fn) {
+    @name = name
+    @fn = fn
+    @results = []
+  }
+
+  expect_true(predicate) {
+    .__result(predicate, "Expected true, got: %(predicate).")
+  }
+
+  expect_false(predicate) {
+    .__result(!predicate, "Expected false, got: %(predicate).")
+  }
+
+  expect_equals(lhs, rhs) {
+    .__result(lhs == rhs, "Expected %(lhs) (%(lhs.type)) and %(rhs) (%(rhs.type)) to be equal.")
+  }
+
+  name { @name }
+
+  run(reporter) {
+    @results = []
+    reporter.case_begin(@name)
+    @fn(this)
+
+    if (@results.all {|result| result.outcome == TestResult.PASSED }) {
+      reporter.case_passed(@results)
+    } else {
+      reporter.case_failed(@results)
+    }
+  }
+
+  results { @results }
+
+  __result(passed, message) {
+    @results.append(TestResult.new(passed ? TestResult.PASSED : TestResult.FAILED, message))
+  }
+}

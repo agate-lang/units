@@ -1,0 +1,496 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Big integer
+
+def BASE = 0x80000000
+
+class __BigHelper {
+  static add(lhs, rhs) {
+    assert(lhs is Array, "lhs should be an Array.")
+    assert(rhs is Array, "rhs should be an Array.")
+
+    def size = Math.max(lhs.size, rhs.size)
+    def values = Array.new(size, 0)
+    def carry = 0
+
+    for (i in 0...size) {
+      def xl = i < lhs.size ? lhs[i] : 0
+      def xr = i < rhs.size ? rhs[i] : 0
+
+      def sum = carry + xl + xr
+      values[i] = sum % BASE
+      carry = sum / BASE
+      assert(carry == 0 || carry == 1, "Carry should be 0 or 1.")
+    }
+
+    if (carry == 1) {
+      values.append(carry)
+    }
+
+    return .normalize(values)
+  }
+
+  static sub(lhs, rhs) {
+    assert(lhs is Array, "lhs should be an Array.")
+    assert(rhs is Array, "rhs should be an Array.")
+    assert(.cmp(lhs, rhs) >= 0, "lhs should be greater than rhs")
+
+    def size = Math.max(lhs.size, rhs.size)
+    def values = Array.new(size, 0)
+    def carry = 0
+
+    for (i in 0...size) {
+      def xl = i < lhs.size ? lhs[i] : 0
+      def xr = i < rhs.size ? rhs[i] : 0
+
+      if (xl >= xr + carry) {
+        def difference = xl - xr - carry
+        values[i] = difference % BASE
+        carry = difference / BASE
+        assert(carry == 0 || carry == 1, "Carry should be 0 or 1.")
+      } else {
+        def difference = BASE + xl - xr - carry
+        values[i] = difference % BASE
+        carry = 1 + (difference / BASE)
+        assert(carry == 1, "Carry should be 1.")
+      }
+    }
+
+    assert(carry == 0, "Carry should be 0.")
+    return .normalize(values)
+  }
+
+  static split(values, n) {
+    return (n < values.size) ? [ values[0...n], values[n..-1] ] : [ values, [ 0 ] ]
+  }
+
+  static mul_karatsuba(lhs, rhs) {
+    assert(lhs is Array, "lhs should be an Array.")
+    assert(rhs is Array, "rhs should be an Array.")
+    def size = Math.max(lhs.size, rhs.size)
+
+    if (size == 1) {
+      def product = lhs[0] * rhs[0]
+      def values = [ product % BASE, product / BASE ]
+      if (values[1] == 0) {
+        values.erase(-1)
+      }
+      return values
+    }
+
+    def size2 = size / 2
+    def sl = .split(lhs, size2)
+    def sr = .split(rhs, size2)
+
+    # 0 = least, 1 = most
+    def c1 = .mul_karatsuba(sl[1], sr[1])
+    def c3 = .mul_karatsuba(sl[0], sr[0])
+
+    def suml = .add(sl[0], sl[1])
+    def sumr = .add(sr[0], sr[1])
+    def prod = .mul_karatsuba(suml, sumr)
+
+    def c2 = .sub(.sub(prod, c1), c3)
+
+    c2 = [ 0 ] * size2 + c2
+    c1 = [ 0 ] * (2 * size2) + c1
+
+    return .add(.add(c1, c2), c3)
+  }
+
+  static mul_short(lhs, rhs) {
+    assert(lhs is Array, "lhs should be an Array.")
+    assert(rhs is Int, "rhs should be an Int.")
+    assert(0 <= rhs && rhs < BASE, "rhs should be in [0, BASE[.")
+    def size = lhs.size
+    def values = Array.new(size + 1, 0)
+    def carry = 0
+
+    for (i in 0...size) {
+      def prod = carry + lhs[i] * rhs
+      values[i] = prod % BASE
+      carry = prod / BASE
+    }
+
+    assert(carry < BASE, "Carry shoud be less than BASE.")
+    values[size] = carry
+    return .normalize(values)
+  }
+
+  static mul(lhs, rhs) { .mul_karatsuba(lhs, rhs) }
+
+  static div_short(lhs, rhs) {
+    assert(lhs is Array, "lhs should be an Array.")
+    assert(rhs is Int && 0 < rhs && rhs < BASE, "rhs should be an Int.")
+
+    def size = lhs.size
+    def quo = Array.new(size, 0)
+    def rem = 0
+
+    for (i in 0...size) {
+      rem = rem * BASE + lhs[size - i - 1]
+      quo[size - i - 1] = rem / rhs
+      rem = rem % rhs
+    }
+
+    return [ quo, rem ]
+  }
+
+  static div(lhs, rhs) {
+    assert(lhs is Array, "lhs should be an Array.")
+    assert(rhs is Array, "rhs should be an Array.")
+    assert(lhs[-1] != 0, "lhs should be normalized.")
+    assert(rhs[-1] != 0, "lhs should be normalized.")
+
+    if (.cmp(lhs, rhs) < 0) {
+      return [ [ 0 ], lhs.to_a ]
+    }
+
+    if (rhs.size == 1) {
+      def qr = .div_short(lhs, rhs[0])
+      return [ .normalize(qr[0]), .normalize([ qr[1] ]) ]
+    }
+
+    def m = lhs.size
+    def n = rhs.size
+    def d = BASE / (rhs[-1] + 1)
+    def u = .mul_short(lhs, d)
+
+    if (u.size == m) {
+      u.append(0)
+    }
+
+    assert(u.size == m + 1, "u should have a size of m + 1.")
+
+    def v = .mul_short(rhs, d)
+    assert(v.size == n, "v should have a size of n")
+
+    def vm = v[-1]
+    assert(vm >= BASE / 2, "")
+
+    assert(m >= n, "m should be greater than n.")
+    def k = m - n
+
+    def quo = Array.new(k + 1, 0)
+
+    for (i in 0..k) {
+      def u0 = u[(k-i)..-1] # TODO: slice?
+      def qh
+      def rh
+
+      if (u0[n] == vm) {
+        qh = BASE - 1
+        rh = u0[n] + u0[n - 1]
+      } else {
+        def x = u0[n] * BASE + u0[n - 1]
+        qh = x / vm
+        rh = x % vm
+      }
+
+      assert(n >= 2, "n should be greater than 2.")
+      assert(n - 2 < v.size, "n should be less than the size of v.")
+      assert(n - 2 < u0.size, "n should be less than the size of u0.")
+
+      while (rh < BASE && qh * v[n - 2] > BASE * rh + u0[n - 2]) {
+        qh = qh - 1
+        rh = rh + vm
+      }
+
+      def qhv = .mul_short(v, qh)
+
+      if (.cmp(u0, qhv) < 0) {
+        qh = qh - 1
+        qhv = .sub(qhv, v)
+      }
+
+      assert(.cmp(u0, qhv) >= 0, "")
+
+
+      def u1 = .sub(u0, qhv)
+      quo[k - i] = qh
+
+      for (j in 0..n) {
+        u[k - i + j] = (j < u1.size ? u1[j] : 0)
+      }
+    }
+
+    def qr = .div_short(u, d)
+    assert(qr[1] == 0, "")
+    def rem = qr[0]
+
+    return [ .normalize(quo), .normalize(rem) ]
+  }
+
+  static is_zero(values) { values.all {|n| n == 0 } }
+
+  static cmp(lhs, rhs) {
+    assert(lhs is Array, "lhs should be an Array.")
+    assert(rhs is Array, "rhs should be an Array.")
+
+    def size = Math.max(lhs.size, rhs.size)
+
+    for (i in 0...size) {
+      def index = size - i - 1
+      def nl = index < lhs.size ? lhs[index] : 0
+      def nr = index < rhs.size ? rhs[index] : 0
+
+      if (nl > nr) {
+        return 1
+      } else if (nl < nr) {
+        return -1
+      }
+    }
+
+    return 0
+  }
+
+  static to_chars(values, base) {
+    def digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".to_a
+    assert(base < digits.size, "Base should be less than %(digits.size)")
+    def chars = []
+    while (!.is_zero(values)) {
+      def qr = .div_short(values, base)
+      chars.append(digits[qr[1]])
+      values = qr[0]
+    }
+    return chars.reverse()
+  }
+
+  static normalize(values) {
+    while (values.size > 1 && values[-1] == 0) {
+      values.erase(-1)
+    }
+    return values
+  }
+
+}
+
+class BigInteger {
+  construct new() {
+    @values = [ 0 ]
+    @positive = true
+  }
+
+  construct new(input) {
+    if (input is Int) {
+      if (input < 0) {
+        @positive = false
+        input = -input
+      } else {
+        @positive = true
+      }
+
+      if (input < BASE) {
+        @values = [ input ]
+      } else {
+        @values = [ input / BASE, input % BASE ]
+      }
+    } else if (input is String) {
+      .__from_s(input, 10)
+    } else if (input is BigInteger) {
+      @value = input.__values.to_a
+      @positive = input.positive
+    } else {
+      System.abort("input should an Int or a String or a BigInteger.")
+    }
+  }
+
+  construct new(input, base) {
+    .__from_s(input, base)
+  }
+
+  construct __new(values, positive) {
+    @values = values
+    @positive = positive
+  }
+
+  positive { @positive }
+
+  is_zero { __BigHelper.is_zero(@values) }
+
+  is_one { @positive && @values.size == 1 && @values[0] == 1 }
+
+  + { BigInteger.__new(@values.to_a, @positive) }
+  - { BigInteger.__new(@values.to_a, !@positive) }
+
+  +(other) {
+    if (@positive == other.positive) {
+      def positive = @positive
+      return BigInteger.__new(__BigHelper.add(@values, other.__values), positive)
+    }
+
+    if (__BigHelper.cmp(@values, other.__values) > 0) {
+      return BigInteger.__new(__BigHelper.sub(@value, other.__values), @positive)
+    }
+
+    return BigInteger.__new(__BigHelper.sub(other.__values, @value), !@positive)
+  }
+
+  -(other) {
+    def opposite = BigInteger.__new(other.__values, !other.positive)
+    return this + opposite
+  }
+
+  *(other) {
+    def values = __BigHelper.mul(@values, other.__values)
+    return BigInteger.__new(values, @positive == other.positive)
+  }
+
+  /(other) { BigInteger.__div(this, other)[0] }
+  %(other) { BigInteger.__div(this, other)[1] }
+
+  ==(other) { BigInteger.__cmp(this, other) == 0 }
+  !=(other) { BigInteger.__cmp(this, other) != 0 }
+  <(other) { BigInteger.__cmp(this, other) < 0 }
+  <=(other) { BigInteger.__cmp(this, other) <= 0 }
+  >(other) { BigInteger.__cmp(this, other) > 0 }
+  >=(other) { BigInteger.__cmp(this, other) >= 0 }
+
+  to_s { .to_s(10) }
+
+  to_s(base) {
+    if (.is_zero) {
+      return "0"
+    }
+    def chars = __BigHelper.to_chars(@values, base)
+    if (!@positive) {
+      chars.insert(0, '-')
+    }
+    return chars.join()
+  }
+
+  cmp_zero() {
+    if (__BigHelper.is_zero(@values)) {
+      return 0
+    }
+    return @positive ? 1 : -1
+  }
+
+  static gcd(a, b) {
+    while (!b.is_zero) {
+      def tmp = b
+      b = a % b
+      a = tmp
+    }
+    return a
+  }
+
+  static exp(x, n) {
+    assert(n.positive, "b should be positive")
+    if (n.is_zero) {
+      return BigInteger.new(1)
+    }
+    def y = BigInteger.new(1)
+    while (n > 1) {
+      def qr = .__div(n, BigInteger.new(2))
+      if (qr[1].is_zero) {
+        x = x * x
+      } else {
+        y = y * x
+        x = x * x
+      }
+      n = qr[0]
+    }
+    return x * y
+  }
+
+  __values { @values }
+  __flip_sign() { @positive = !@positive }
+
+  static __div(lhs, rhs) {
+    def cmpr = rhs.cmp_zero()
+
+    if (cmpr == 0) {
+      System.abort("Division by zero")
+    }
+
+    if (cmpr < 0) {
+      def opposite = BigInteger.__new(rhs.__values, !rhs.positive)
+      def qr = .__div(lhs, opposite)
+      qr[0].__flip_sign()
+      return qr
+    }
+
+    def cmpl = lhs.cmp_zero()
+
+    if (cmpl < 0) {
+      def opposite = BigInteger.__new(lhs.__values, !lhs.positive)
+      def qr = .__div(opposite, rhs)
+
+      qr[0].__flip_sign()
+
+      if (qr[1].cmp_zero() != 0) {
+        qr[0] = qr[0] - BigInteger.new(1)
+        qr[1] = rhs - qr[1]
+      }
+
+      return qr
+    }
+
+    assert(cmpr > 0, "")
+    assert(cmpl >= 0, "")
+
+    def qr = __BigHelper.div(lhs.__values, rhs.__values)
+    return [ BigInteger.__new(qr[0], true), BigInteger.__new(qr[1], true) ]
+  }
+
+  static __cmp(lhs, rhs) {
+    if (rhs is Int) {
+      rhs = BigInteger.new(rhs)
+    }
+    def cmp = __BigHelper.cmp(lhs.__values, rhs.__values)
+    if (lhs.positive) {
+      if (rhs.positive) {
+        return cmp
+      }
+      if (lhs.is_zero && rhs.is_zero) {
+        return 0
+      }
+      return 1
+    }
+    if (!rhs.positive) {
+      return -cmp
+    }
+    if (lhs.is_zero && rhs.is_zero) {
+      return 0
+    }
+    return -1
+  }
+
+  static __char_to_int(c) {
+    if ('0' <= c && c <= '9') {
+      return c.to_i - '0'.to_i
+    }
+    if ('a' <= c && c <= 'z') {
+      return c.to_i - 'a'.to_i + 10
+    }
+    if ('A' <= c && c <= 'Z') {
+      return c.to_i - 'A'.to_i + 10
+    }
+    System.abort("Unknown digit: %(c)")
+  }
+
+  __from_s(input, base) {
+    assert(!input.empty, "Input should contain a non-empty String.")
+    input = input.to_a
+    @positive = true
+    if (input[0] == '-') {
+      @positive = false
+      input = input.skip(1)
+    }
+    def values = [ 0 ]
+    for (c in input) {
+      def digit = BigInteger.__char_to_int(c)
+
+      if (digit >= base) {
+        System.abort("Digit '%(c)' is not compatible with base %(base)")
+      }
+
+      values = __BigHelper.mul_short(values, base)
+      values = __BigHelper.add(values, [ digit ])
+    }
+    @values = values
+  }
+
+}

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2022 Julien Bernard
 #
-# Heap, PriorityQueue
+# Heap, Priority queue
 
 class Heap {
   construct new() {

@@ -1,0 +1,12 @@
+class TestResult {
+  static PASSED { 1 }
+  static FAILED { 2 }
+
+  construct new(outcome, message) {
+    @outcome = outcome
+    @message = message
+  }
+
+  outcome { @outcome }
+  message { @message }
+}

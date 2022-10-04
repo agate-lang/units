@@ -1,0 +1,87 @@
+import "test/result" for TestResult
+
+def GREEN = "\e[32m"
+def RED = "\e[31m"
+def RESET = "\e[0m"
+
+def to_ms(duration) { (duration * 1000.0).to_i }
+
+class ConsoleReporter {
+  construct new() {
+    @run_clock = 0.0
+    @suite_name = ""
+    @suite_clock = 0.0
+    @suite_total = 0
+    @case_name = ""
+    @case_count = 0
+    @case_clock = 0.0
+    @case_total = 0
+    @passed = 0
+    @failed = 0
+    @failed_list = []
+  }
+
+  run_begin(suites, cases) {
+    @suite_total = suites
+    @case_total = cases
+    IO.println("%(GREEN)[==========]%(RESET) Running %(@suite_total) suites, %(@case_total) cases")
+    @run_clock = System.clock
+  }
+
+  run_end() {
+    def duration = System.clock - @run_clock
+    IO.println("%(GREEN)[==========]%(RESET) Finished %(@suite_total) suites, %(@case_total) cases (%(to_ms(duration)) ms)")
+    IO.println("%(GREEN)[  PASSED  ]%(RESET) %(@passed) tests.")
+
+    if (@failed > 0) {
+      IO.println("%(RED)[  FAILED  ]%(RESET) %(@failed) tests, listed below:")
+      for (failed in @failed_list) {
+        IO.println("%(RED)[  FAILED  ]%(RESET) %(failed)")
+      }
+      IO.println()
+      IO.println("%(@failed) TESTS FAILED")
+    }
+  }
+
+  suite_begin(name, cases) {
+    @suite_name = name
+    @case_count = cases
+    IO.println("%(GREEN)[----------]%(RESET) %(@case_count) cases from suite %(@suite_name)")
+    @suite_clock = System.clock
+  }
+
+  suite_end() {
+    def duration = System.clock - @suite_clock
+    IO.println("%(GREEN)[----------]%(RESET) %(@case_count) cases from suite %(@suite_name) (%(to_ms(duration)) ms)")
+    IO.println()
+  }
+
+  case_begin(name) {
+    @case_name = name
+    IO.println("%(GREEN)[ RUN      ]%(RESET) %(@suite_name).%(@case_name)")
+    @case_clock = System.clock
+  }
+
+  case_passed(results) {
+    def duration = System.clock - @case_clock
+    .__results(results)
+    IO.println("%(GREEN)[       OK ]%(RESET) %(@suite_name).%(@case_name) (%(to_ms(duration)) ms)")
+    @passed = @passed + 1
+  }
+
+  case_failed(results) {
+    def duration = System.clock - @case_clock
+    .__results(results)
+    IO.println("%(RED)[  FAILED  ]%(RESET) %(@suite_name).%(@case_name) (%(to_ms(duration)) ms)")
+    @failed = @failed + 1
+    @failed_list.append("%(@suite_name).%(@case_name)")
+  }
+
+  __results(results) {
+    for (result in results) {
+      if (result.outcome != TestResult.PASSED) {
+        IO.println("%(result.message)")
+      }
+    }
+  }
+}
