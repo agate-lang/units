@@ -257,6 +257,14 @@ class __BigHelper {
     return chars.reverse()
   }
 
+  static to_i(values) {
+    def i = 0
+    for (value in values) {
+      i = i * BASE + value
+    }
+    return i
+  }
+
   static normalize(values) {
     while (values.size > 1 && values[-1] == 0) {
       values.erase(-1)
@@ -281,11 +289,14 @@ class BigInteger {
         @positive = true
       }
 
-      if (input < BASE) {
-        @values = [ input ]
-      } else {
-        @values = [ input / BASE, input % BASE ]
-      }
+      def values = Array.new(3, 0)
+      values[0] = input % BASE
+      input = input / BASE
+      values[1] = input % BASE
+      input = input / BASE
+      assert(input < BASE, "input should be less than BASE.")
+      values[2] = input
+      @values = __BigHelper.normalize(values)
     } else if (input is String) {
       .__from_s(input, 10)
     } else if (input is BigInteger) {
@@ -315,24 +326,33 @@ class BigInteger {
   - { BigInteger.__new(@values.to_a, !@positive) }
 
   +(other) {
+    if (other is Int) {
+      other = BigInteger.new(other)
+    }
     if (@positive == other.positive) {
       def positive = @positive
       return BigInteger.__new(__BigHelper.add(@values, other.__values), positive)
     }
 
     if (__BigHelper.cmp(@values, other.__values) > 0) {
-      return BigInteger.__new(__BigHelper.sub(@value, other.__values), @positive)
+      return BigInteger.__new(__BigHelper.sub(@values, other.__values), @positive)
     }
 
-    return BigInteger.__new(__BigHelper.sub(other.__values, @value), !@positive)
+    return BigInteger.__new(__BigHelper.sub(other.__values, @values), !@positive)
   }
 
   -(other) {
+    if (other is Int) {
+      other = BigInteger.new(other)
+    }
     def opposite = BigInteger.__new(other.__values, !other.positive)
     return this + opposite
   }
 
   *(other) {
+    if (other is Int) {
+      other = BigInteger.new(other)
+    }
     def values = __BigHelper.mul(@values, other.__values)
     return BigInteger.__new(values, @positive == other.positive)
   }
@@ -358,6 +378,19 @@ class BigInteger {
       chars.insert(0, '-')
     }
     return chars.join()
+  }
+
+  to_i {
+    if (@positive) {
+      if (this <= Int.MAX) {
+        return __BigHelper.to_i(@values)
+      }
+    } else {
+      if (this >= Int.MIN + 1) {
+        return -__BigHelper.to_i(@values)
+      }
+    }
+    System.abort("Value of BigInteger does not fit in an Int.")
   }
 
   cmp_zero() {
@@ -399,6 +432,9 @@ class BigInteger {
   __flip_sign() { @positive = !@positive }
 
   static __div(lhs, rhs) {
+    if (rhs is Int) {
+      rhs = BigInteger.new(rhs)
+    }
     def cmpr = rhs.cmp_zero()
 
     if (cmpr == 0) {
