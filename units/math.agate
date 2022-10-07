@@ -5,3 +5,5 @@
 
 import "math/algebra" for Mat2, Mat3, Mat, Vec2, Vec3, Vec
 import "math/big" for BigInteger
+import "math/complex" for Complex
+import "math/rational" for Rational

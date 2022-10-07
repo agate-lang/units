@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Rational
+
+class Rational {
+  construct new(num, den) {
+    assert(num is Int, "Num should be an integer.")
+    assert(den is Int, "Den should be an integer.")
+    if (den == 0) { System.abort("Division by zero.") }
+    if (num == 0) { den = 1 }
+    if (den < 0) {
+      num = -num
+      den = -den
+    }
+    def gcd = Math.gcd(num, den)
+    @num = num / gcd
+    @den = den / gcd
+  }
+
+  static new(num) { Rational.new(num, 1) }
+
+  num { @num }
+  den { @den }
+
+  +(other) { Rational.new(@num * other.den + @den * other.num, @den * other.den) }
+  -(other) { Rational.new(@num * other.den - @den * other.num, @den * other.den) }
+  *(other) { Rational.new(@num * other.num, @den * other.den) }
+  /(other) { Rational.new(@num * other.den, @den * other.num) }
+
+  inverse { Rational.new(@den, @num) }
+
+  to_f { @num.to_f / @den.to_f }
+  to_i { @num / @den }
+
+  cmp(other) { @num * other.den - @den * other.num }
+
+  ==(other) { .cmp(other) == 0 }
+  !=(other) { .cmp(other) != 0 }
+  <(other) { .cmp(other) < 0 }
+  <=(other) { .cmp(other) <= 0 }
+  >(other) { .cmp(other) > 0 }
+  >=(other) { .cmp(other) >= 0 }
+}

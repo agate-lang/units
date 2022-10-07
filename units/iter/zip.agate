@@ -1,0 +1,86 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Zip
+
+class __Zip2 {
+  construct new(seq0, seq1) {
+    @seq1 = seq0
+    @seq2 = seq1
+  }
+
+  iterate(iterator) {
+    # TODO: use tuple when ready
+
+    if (iterator == nil) {
+      def it0 = @seq0.iterate(nil)
+      def it1 = @seq1.iterate(nil)
+      if (it0 == nil || it1 == nil) {
+        return nil
+      }
+      return [ it0, it1 ]
+    }
+
+    assert(iterator is Array, "Invalid iterator")
+    assert(iterator.size == 2, "Invalid iterator")
+
+    def it0 = @seq0.iterate(iterator[0])
+    def it1 = @seq1.iterate(iterator[1])
+    if (it0 == nil || it1 == nil) {
+      return nil
+    }
+    return [ it0, it1 ]
+  }
+
+  iterator_value(iterator) {
+    assert(iterator is Array)
+    assert(iterator.size == 2)
+    def value0 = @seq0.iterator_value(iterator[0])
+    def value1 = @seq1.iterator_value(iterator[1])
+    return [ value0, value1 ]
+  }
+}
+
+class __ZipAny {
+  construct new(seqs) {
+    @seqs = seqs
+  }
+
+  iterate(iterator) {
+    if (iterator == nil) {
+      iterator = []
+      for (i in 0...@seqs.size) {
+        def it = @seqs[i].iterate(nil)
+        if (it == nil) {
+          return nil
+        }
+        iterator.append(it)
+      }
+      return iterator
+    }
+
+    assert(iterator is Array, "Invalid iterator")
+    assert(iterator.size == @seqs.size, "Invalid iterator")
+
+    for (i in 0...@seqs.size) {
+      def it = @seqs[i].iterate(iterator[i])
+      if (it == nil) {
+        return nil
+      }
+      iterator[i] = it
+    }
+    return iterator
+  }
+
+  iterator_value(iterator) {
+    assert(iterator is Array)
+    assert(iterator.size == @seqs.size)
+    def value = []
+    for (i in 0...@seqs.size) {
+      value.append(@seqs[i].iterator_value(iterator[i]))
+    }
+    return value
+  }
+
+}
+

@@ -4,8 +4,8 @@
 # Vectors
 
 class Vec2 {
-  construct new() {
-    @x = @y = 0.0
+  construct new(value) {
+    @x = @y = value
   }
 
   construct new(x, y) {
@@ -35,8 +35,8 @@ class Vec2 {
 }
 
 class Vec3 {
-  construct new() {
-    @x = @y = @z = 0.0
+  construct new(value) {
+    @x = @y = @z = value
   }
 
   construct new(x, y, z) {
@@ -69,9 +69,9 @@ class Vec3 {
 }
 
 class Vec {
-  construct new(size) {
+  construct new(size, value) {
     assert(size > 0, "Vec must have a positive size")
-    @data = Array.new(size, 0.0)
+    @data = Array.new(size, value)
   }
 
   [index] { @data[index] }
@@ -80,7 +80,7 @@ class Vec {
   + { this }
   - {
     def size = @data.size
-    def res = Vec.new(size)
+    def res = Vec.new(size, nil)
     for (i in 0...size) {
       res[i] = -@data[i]
     }
@@ -105,7 +105,7 @@ class Vec {
   __operator(other, binop) {
     def size = @data.size
     assert(other.size == size, "Other must have the same sime")
-    def res = Vec.new(size)
+    def res = Vec.new(size, nil)
     if (other is Float) {
       for (i in 0...size) {
         res[i] = binop(@data[i], other)
@@ -117,4 +117,17 @@ class Vec {
     }
     return res
   }
+}
+
+def vec2(x, y) { Vec2.new(x, y) }
+def vec3(x, y, z) { Vec3.new(x, y, z) }
+
+def vec(size, value) {
+  if (size == 2) {
+    return Vec2.new(value)
+  }
+  if (size == 3) {
+    return Vec3.new(value)
+  }
+  return Vec.new(size, value)
 }

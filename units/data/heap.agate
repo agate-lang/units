@@ -66,6 +66,10 @@ class Heap {
     }
     return res
   }
+
+  static sort(seq) {
+    .sort(seq) {|a, b| a < b }
+  }
 }
 
 class PriorityQueue is Heap {

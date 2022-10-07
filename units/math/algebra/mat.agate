@@ -4,8 +4,8 @@
 # Matrices
 
 class Mat2 {
-  construct new() {
-    @m00 = @m01 = @m10 = @m11 = 0.0
+  construct new(value) {
+    @m00 = @m01 = @m10 = @m11 = value
   }
 
   [row, col] { Object.field(this, .__linearize(row, col)) }
@@ -15,8 +15,8 @@ class Mat2 {
 }
 
 class Mat3 {
-  construct new() {
-    @m00 = @m01 = @m02 = @m10 = @m11 = @m12 = @m20 = @m21 = @m22 = 0.0
+  construct new(value) {
+    @m00 = @m01 = @m02 = @m10 = @m11 = @m12 = @m20 = @m21 = @m22 = value
   }
 
   [row, col] { Object.field(this, .__linearize(row, col)) }
@@ -26,8 +26,8 @@ class Mat3 {
 }
 
 class Mat {
-  construct new(rows, cols) {
-    @data = Array.new(rows * cols, 0.0)
+  construct new(rows, cols, value) {
+    @data = Array.new(rows * cols, value)
     @rows = rows
     @cols = cols
   }

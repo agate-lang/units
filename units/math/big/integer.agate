@@ -406,6 +406,7 @@ class BigInteger {
       b = a % b
       a = tmp
     }
+    if (!a.positive) { a.__flip_sign() }
     return a
   }
 
