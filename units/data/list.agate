@@ -9,12 +9,12 @@ class __ListNode {
     @next = next
     @data = data
   }
-  __prev { @prev }
-  __prev=(node) { @prev = node }
-  __next { @next }
-  __next=(node) { @next = node }
-  __data { @data }
-  __data=(data) { @data = data }
+  prev { @prev }
+  prev=(node) { @prev = node }
+  next { @next }
+  next=(node) { @next = node }
+  data { @data }
+  data=(data) { @data = data }
 }
 
 class List is Sequence {
@@ -44,25 +44,25 @@ class List is Sequence {
       return @head
     }
     assert(iterator is __ListNode, "Iterator should be a list node.")
-    return iterator.__next
+    return iterator.next
   }
 
   iterator_value(iterator) {
     assert(iterator is __ListNode, "Iterator should be a list node.")
-    return iterator.__data
+    return iterator.data
   }
 
   __remove_node(node) {
     assert(node is __ListNode, "Iterator should be a list node.")
-    if (node.__prev != nil) {
-      node.__prev.__next = node.__next
+    if (node.prev != nil) {
+      node.prev.next = node.next
     } else {
-      @head = node.__next
+      @head = node.next
     }
-    if (node.__next != nil) {
-      node.__next.__prev = node.__prev
+    if (node.next != nil) {
+      node.next.prev = node.prev
     } else {
-      @tail = node.__prev
+      @tail = node.prev
     }
   }
 

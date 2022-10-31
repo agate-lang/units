@@ -15,4 +15,28 @@ TestSuite.new("Heap") {|suite|
     case.expect_equals(h.size, 1)
     case.expect_equals(h.top, 42)
   }
+
+
+  suite.case("Random") {|case|
+    def random = Random.new(42)
+    def array = []
+    for (i in 1..1000) {
+      array.append(random.int(200))
+    }
+
+    def h = Heap.new()
+    for (x in array) {
+      h.push(x)
+    }
+
+    array.sort()
+
+    for (x in array) {
+      case.expect_false(h.empty)
+      case.expect_equals(x, h.top)
+      h.pop()
+    }
+
+    case.expect_true(h.empty)
+  }
 }

@@ -4,9 +4,11 @@
 # Iter
 
 import "iter/zip" for __Zip2
+import "iter/enumerate" for __Enumerate
 
 class Iter {
   static is_iterable(seq) { Object.has_method(seq, "iterate(_)") && Object.has_method(seq, "iterator_value(_)") }
 
+  static enumerate(seq) { __Enumerate(seq) }
   static zip(seq1, seq2) { __Zip2.new(seq1, seq2) }
 }

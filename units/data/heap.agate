@@ -38,9 +38,11 @@ class Heap {
     def i = 0
     while (i < max) {
       def lt = 2 * i + 1
+      assert(lt < @data.size, "lt")
       def rt = 2 * i + 2
+      assert(rt < @data.size, "rt")
       if (@comp(@data[i], @data[lt]) && @comp(@data[i], @data[rt])) {
-        return
+        break
       }
       def j = @comp(@data[lt], @data[rt]) ? lt : rt
       @data.swap(i, j)

@@ -1,1 +1,2 @@
 import "math/big/integer" for BigInteger
+import "math/big/natural" for BigNatural

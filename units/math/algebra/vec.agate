@@ -21,6 +21,8 @@ class Vec2 {
   [index] { Object.field(this, index) }
   [index]=(value) { Object.field(this, index, value) }
 
+  size { 2 }
+
   + { this }
   - { Vec2.new(-@x, -@y) }
 
@@ -55,6 +57,8 @@ class Vec3 {
   [index] { Object.field(this, index) }
   [index]=(value) { Object.field(this, index, value) }
 
+  size { 3 }
+
   + { this }
   - { Vec3.new(-@x, -@y, -@z) }
 
@@ -76,6 +80,8 @@ class Vec {
 
   [index] { @data[index] }
   [index]=(value) { @data[index] = value }
+
+  size { @data.size }
 
   + { this }
   - {

@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Set
+
+class Set is Sequence {
+  construct new() {
+    @data = Map.new()
+  }
+  clear() { @data.clear() }
+  contains(key) { @data.contains(key) }
+  erase(key) { @data.erase(key) }
+  insert(key) { @data.insert(key, nil) }
+  iterate(iterator) { @data.iterate(iterator) }
+  iterator_value(iterator) { @data.__key_from_iterator(iterator) }
+  size { @data.size }
+  to_s { "{%(.join(", "))}" }
+}

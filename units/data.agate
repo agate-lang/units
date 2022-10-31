@@ -1,2 +1,3 @@
 import "data/heap" for Heap, PriorityQueue
 import "data/list" for List
+import "data/set" for Set

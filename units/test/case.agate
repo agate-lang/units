@@ -22,7 +22,7 @@ class TestCase {
   name { @name }
 
   run(reporter) {
-    @results = []
+    @results.clear()
     reporter.case_begin(@name)
     @fn(this)
 

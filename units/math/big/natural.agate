@@ -1,0 +1,143 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022 Julien Bernard
+#
+# Big natural
+
+import "math/big/basic" for __Basic
+
+class BigNatural {
+  construct new() {
+    @digits = [ 0 ]
+  }
+
+  construct new(input) {
+    if (input is Int) {
+      assert(input >= 0, "Natural can only represent positive integers.")
+      @digits = __Basic.from_int(input)
+    } else if (input is String) {
+      assert(!input.empty, "input should not be an empty string.")
+      @digits = __Basic.from_string(input, 10)
+    } else if (input is BigNatural) {
+      @digits = input.__digits.to_a
+    } else {
+      System.abort("input should an Int or a String or a BigNatural.")
+    }
+  }
+
+  construct new(input, base) {
+    assert(!input.empty, "input should not be an empty string.")
+    @digits = __Basic.from_string(input, base)
+  }
+
+  construct __raw(digits) {
+    @digits = digits
+  }
+
+  positive { true }
+  is_zero { __Basic.is_zero(@digits) }
+  is_one { @digits.size == 1 && @digits[0] == 1 }
+
+  + { BigNatural.__raw(@digits.to_a) }
+
+  +(other) {
+    if (!(other is BigNatural)) {
+      other = BigNatural.new(other)
+    }
+    def digits = __Basic.add(@digits, other.__digits)
+    return BigNatural.__raw(digits)
+  }
+
+  -(other) {
+    if (!(other is BigNatural)) {
+      other = BigNatural.new(other)
+    }
+    if (__Basic.cmp(@digits, other.__digits) < 0) {
+      System.abort("Substraction is impossible.")
+    }
+    def digits = __Basic.sub(@digits, other.__digits)
+    return BigNatural.__raw(digits)
+  }
+
+  *(other) {
+    if (!(other is BigNatural)) {
+      other = BigNatural.new(other)
+    }
+    def digits = __Basic.mul(@digits, other.__digits)
+    return BigNatural.__raw(digits)
+  }
+
+  /(other) { BigNatural.__div(this, other)[0] }
+  %(other) { BigNatural.__div(this, other)[1] }
+
+  cmp(other) {
+    if (!(other is BigNatural)) {
+      other = BigNatural.new(other)
+    }
+    return __Basic.cmp(@digits, other.__digits)
+  }
+
+  ==(other) { .cmp(other) == 0 }
+  !=(other) { .cmp(other) != 0 }
+  <(other) { .cmp(other) < 0 }
+  <=(other) { .cmp(other) <= 0 }
+  >(other) { .cmp(other) > 0 }
+  >=(other) { .cmp(other) >= 0 }
+
+  to_s { .to_s(10) }
+  to_s(base) {
+    if (.is_zero) {
+      return "0"
+    }
+    def chars = __Basic.to_chars(@digits, base)
+    return chars.join()
+  }
+
+  to_i {
+    if (this <= Int.MAX) {
+      return __Basic.to_i(@digits)
+    }
+    System.abort("Value of BigInteger does not fit in an Int.")
+  }
+
+  static exp(x, n) {
+    if (n.is_zero) {
+      return BigNatural.new(1)
+    }
+    def y = BigNatural.new(1)
+    while (n > 1) {
+      def qr = .__div(n, BigNatural.new(2))
+      if (qr[1].is_zero) {
+        x = x * x
+      } else {
+        y = y * x
+        x = x * x
+      }
+      n = qr[0]
+    }
+    return x * y
+  }
+
+  static gcd(a, b) {
+    while (!b.is_zero) {
+      def tmp = b
+      b = a % b
+      a = tmp
+    }
+    return a
+  }
+
+  __digits { @digits }
+
+  static __div(lhs, rhs) {
+    if (!(rhs is BigNatural)) {
+      rhs = BigNatural.new(rhs)
+    }
+    if (rhs.is_zero) {
+      System.abort("Division by zero")
+    }
+    def qr = __Basic.div(lhs.__digits, rhs.__digits)
+    return [ BigNatural.__raw(qr[0]), BigNatural.__raw(qr[1]) ]
+  }
+
+
+}
