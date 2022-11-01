@@ -1,0 +1,6 @@
+#ifndef AGATE_TAGS_H
+#define AGATE_TAGS_H
+
+#define AGATE_MATH_BIG_INTEGER_TAG  0x00010001
+
+#endif // AGATE_TAGS_H

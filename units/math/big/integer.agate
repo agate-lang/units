@@ -3,107 +3,24 @@
 #
 # Big integer
 
-import "math/big/basic" for __Basic
+foreign class Integer {
+  construct new() foreign
+  construct new(input) foreign
+  construct new(input, base) foreign
 
-class BigInteger {
-  construct new() {
-    @digits = [ 0 ]
-    @positive = true
-  }
+  positive foreign
+  is_zero foreign
 
-  construct new(input) {
-    if (input is Int) {
-      if (input < 0) {
-        @positive = false
-        input = -input
-      } else {
-        @positive = true
-      }
+  + foreign
+  - foreign
 
-      @digits = __Basic.from_int(input)
-    } else if (input is String) {
-      .__from_s(input, 10)
-    } else if (input is BigInteger) {
-      @digits = input.__digits.to_a
-      @positive = input.positive
-    } else {
-      System.abort("input should an Int or a String or a BigInteger.")
-    }
-  }
+  +(other) foreign
+  -(other) foreign
+  *(other) foreign
+  /(other) foreign
+  %(other) foreign
 
-  construct new(input, base) {
-    .__from_s(input, base)
-  }
-
-  construct __raw(digits, positive) {
-    @digits = digits
-    @positive = positive
-  }
-
-  positive { @positive }
-  is_zero { __Basic.is_zero(@digits) }
-  is_one { @positive && @digits.size == 1 && @digits[0] == 1 }
-
-  + { BigInteger.__raw(@digits.to_a, @positive) }
-  - { BigInteger.__raw(@digits.to_a, !@positive) }
-
-  +(other) {
-    if (!(other is BigInteger)) {
-      other = BigInteger.new(other)
-    }
-    if (@positive == other.positive) {
-      def digits = __Basic.add(@digits, other.__digits)
-      return BigInteger.__raw(digits, @positive)
-    }
-    if (__Basic.cmp(@digits, other.__digits) > 0) {
-      def digits = __Basic.sub(@digits, other.__digits)
-      return BigInteger.__raw(digits, @positive)
-    }
-    def digits = __Basic.sub(other.__digits, @digits)
-    return BigInteger.__raw(digits, !@positive)
-  }
-
-  -(other) {
-    if (!(other is BigInteger)) {
-      other = BigInteger.new(other)
-    }
-    def opposite = BigInteger.__raw(other.__digits, !other.positive)
-    return this + opposite
-  }
-
-  *(other) {
-    if (other is Int) {
-      other = BigInteger.new(other)
-    }
-    def digits = __Basic.mul(@digits, other.__digits)
-    return BigInteger.__raw(digits, @positive == other.positive)
-  }
-
-  /(other) { BigInteger.__div(this, other)[0] }
-  %(other) { BigInteger.__div(this, other)[1] }
-
-  cmp(other) {
-    if (!(other is BigInteger)) {
-      other = BigInteger.new(other)
-    }
-    def cmp = __Basic.cmp(@digits, other.__digits)
-    if (@positive) {
-      if (other.positive) {
-        return cmp
-      }
-      if (.is_zero && other.is_zero) {
-        return 0
-      }
-      return 1
-    }
-    if (!other.positive) {
-      return -cmp
-    }
-    if (.is_zero && other.is_zero) {
-      return 0
-    }
-    return -1
-  }
+  cmp(other) foreign
 
   ==(other) { .cmp(other) == 0 }
   !=(other) { .cmp(other) != 0 }
@@ -112,37 +29,23 @@ class BigInteger {
   >(other) { .cmp(other) > 0 }
   >=(other) { .cmp(other) >= 0 }
 
-  cmp_zero() {
-    if (__Basic.is_zero(@digits)) {
-      return 0
-    }
-    return @positive ? 1 : -1
-  }
-
   to_s { .to_s(10) }
-  to_s(base) {
-    if (.is_zero) {
-      return "0"
-    }
-    def chars = __Basic.to_chars(@digits, base)
-    if (!@positive) {
-      chars.insert(0, '-')
-    }
-    return chars.join()
-  }
+  to_s(base) foreign
 
-  to_i {
-    if (@positive) {
-      if (this <= Int.MAX) {
-        return __Basic.to_i(@digits)
-      }
-    } else {
-      if (this >= Int.MIN + 1) {
-        return -__Basic.to_i(@digits)
-      }
-    }
-    System.abort("Value of BigInteger does not fit in an Int.")
-  }
+#   to_i {
+#     if (@positive) {
+#       if (this <= Int.MAX) {
+#         return __Basic.to_i(@digits)
+#       }
+#     } else {
+#       if (this >= Int.MIN + 1) {
+#         return -__Basic.to_i(@digits)
+#       }
+#     }
+#     System.abort("Value of Integer does not fit in an Int.")
+#   }
+
+  static div(lhs, rhs) foreign
 
   static gcd(a, b) {
     while (!b.is_zero) {
@@ -150,18 +53,20 @@ class BigInteger {
       b = a % b
       a = tmp
     }
-    if (!a.positive) { a.__flip_sign() }
+    if (!a.positive) {
+      return -a
+    }
     return a
   }
 
   static exp(x, n) {
     assert(n.positive, "n should be positive")
     if (n.is_zero) {
-      return BigInteger.new(1)
+      return Integer.new(1)
     }
-    def y = BigInteger.new(1)
+    def y = Integer.new(1)
     while (n > 1) {
-      def qr = .__div(n, BigInteger.new(2))
+      def qr = .div(n, Integer.new(2))
       if (qr[1].is_zero) {
         x = x * x
       } else {
@@ -172,58 +77,4 @@ class BigInteger {
     }
     return x * y
   }
-
-  __digits { @digits }
-  __flip_sign() { @positive = !@positive }
-
-  __from_s(input, base) {
-    assert(!input.empty, "Input should contain a non-empty String.")
-    @positive = true
-    if (input.first == '-') {
-      @positive = false
-      input = input.skip(1)
-    }
-    @digits = __Basic.from_string(input, base)
-  }
-
-  static __div(lhs, rhs) {
-    if (rhs is Int) {
-      rhs = BigInteger.new(rhs)
-    }
-    def cmpr = rhs.cmp_zero()
-
-    if (cmpr == 0) {
-      System.abort("Division by zero")
-    }
-
-    if (cmpr < 0) {
-      def opposite = BigInteger.__raw(rhs.__digits, !rhs.positive)
-      def qr = .__div(lhs, opposite)
-      qr[0].__flip_sign()
-      return qr
-    }
-
-    def cmpl = lhs.cmp_zero()
-
-    if (cmpl < 0) {
-      def opposite = BigInteger.__raw(lhs.__digits, !lhs.positive)
-      def qr = .__div(opposite, rhs)
-
-      qr[0].__flip_sign()
-
-      if (qr[1].cmp_zero() != 0) {
-        qr[0] = qr[0] - BigInteger.new(1)
-        qr[1] = rhs - qr[1]
-      }
-
-      return qr
-    }
-
-    assert(cmpr > 0, "")
-    assert(cmpl >= 0, "")
-
-    def qr = __Basic.div(lhs.__digits, rhs.__digits)
-    return [ BigInteger.__raw(qr[0], true), BigInteger.__raw(qr[1], true) ]
-  }
-
 }
