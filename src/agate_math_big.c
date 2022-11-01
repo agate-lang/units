@@ -227,10 +227,7 @@ static void onyxNaturalMulShort(OnyxInteger *self, const OnyxInteger *lhs, uint3
     assert(carry <= UINT32_MAX);
   }
 
-  if (carry > 0) {
-    self->digits[size - 1] = carry;
-  }
-
+  self->digits[size - 1] = carry;
   self->size = size;
   onyxNaturalNormalize(self);
 }
@@ -643,7 +640,7 @@ static void agateIntegerPositive(AgateVM *vm) {
 static void agateIntegerIsZero(AgateVM *vm) {
   assert(agateSlotGetForeignTag(vm, 0) == AGATE_MATH_BIG_INTEGER_TAG);
   OnyxInteger *integer = agateSlotGetForeign(vm, 0);
-  agateSlotSetBool(vm, AGATE_RETURN_SLOT, integer->size == 0 && integer->digits[0] == UINT32_C(0));
+  agateSlotSetBool(vm, AGATE_RETURN_SLOT, integer->size == 1 && integer->digits[0] == UINT32_C(0));
 }
 
 static void agateIntegerCmp(AgateVM *vm) {
