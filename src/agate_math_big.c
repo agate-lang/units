@@ -426,7 +426,7 @@ static void onyxIntegerAdd(OnyxInteger *self, const OnyxInteger *lhs, const Onyx
 static void onyxIntegerSub(OnyxInteger *self, const OnyxInteger *lhs, const OnyxInteger *rhs, AgateVM *vm) {
   OnyxInteger opposite = *rhs;
   opposite.positive = !opposite.positive;
-  onyxIntegerAdd(self, lhs, rhs, vm);
+  onyxIntegerAdd(self, lhs, &opposite, vm);
 }
 
 static void onyxIntegerMul(OnyxInteger *self, const OnyxInteger *lhs, const OnyxInteger *rhs, AgateVM *vm) {

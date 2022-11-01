@@ -146,8 +146,8 @@ TestSuite.new("Integer") {|suite|
   suite.case("SubSingleDigit") {|case|
     def n1 = Integer.new(1234)
     def n2 = Integer.new(5678)
-    def n3 = n2 - n1
-    case.expect_equals(n3, 4444)
+    case.expect_equals(n1 - n2, -4444)
+    case.expect_equals(n2 - n1, 4444)
   }
 
   suite.case("SubManyDigits") {|case|
