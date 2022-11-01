@@ -29,7 +29,7 @@ static void onyxIntegerCreateEmpty(OnyxInteger *self) {
 
 static void onyxIntegerDestroy(OnyxInteger *self, AgateVM *vm) {
   if (self->digits != NULL) {
-    self->digits = agateAllocate(vm, self->digits, 0);
+    self->digits = agateMemoryAllocate(vm, self->digits, 0);
   }
 
   self->size = self->capacity = 0;
@@ -60,7 +60,7 @@ static void onyxNaturalEnsureCapacity(OnyxInteger *self, ptrdiff_t capacity, Aga
     self->capacity = capacity;
   }
 
-  self->digits = agateAllocate(vm, self->digits, self->capacity * sizeof(uint32_t));
+  self->digits = agateMemoryAllocate(vm, self->digits, self->capacity * sizeof(uint32_t));
 }
 
 static void onyxNaturalCopy(OnyxInteger *self, const OnyxInteger *other, AgateVM *vm) {
@@ -848,7 +848,7 @@ static void agateIntegerToS(AgateVM *vm) {
 
   static const char *digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   ptrdiff_t capacity = floor(integer->size * 32 * log(base) / AGATE_LN2) + 1; // + 1 for '-'
-  char *str = agateAllocate(vm, NULL, capacity);
+  char *str = agateMemoryAllocate(vm, NULL, capacity);
   ptrdiff_t size = 0;
 
   OnyxInteger copy;
@@ -881,7 +881,7 @@ static void agateIntegerToS(AgateVM *vm) {
   agateSlotSetStringSize(vm, 0, str, size);
 
   onyxIntegerDestroy(&copy, vm);
-  agateAllocate(vm, str, 0);
+  agateMemoryAllocate(vm, str, 0);
 }
 
 /*
