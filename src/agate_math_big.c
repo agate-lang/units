@@ -31,6 +31,7 @@ static void onyxIntegerCreateEmpty(OnyxInteger *self) {
 static void onyxIntegerDestroy(OnyxInteger *self, AgateVM *vm) {
   if (self->digits != NULL) {
     self->digits = agateMemoryAllocate(vm, self->digits, 0);
+    assert(self->digits == NULL);
   }
 
   self->size = self->capacity = 0;
@@ -71,7 +72,7 @@ static void onyxNaturalCopy(OnyxInteger *self, const OnyxInteger *other, AgateVM
 }
 
 static inline uint32_t onyxNaturalGet(const OnyxInteger *self, ptrdiff_t i) {
-  return i < self->size ? self->digits[i] : UINT32_C(0);
+  return (i < self->size) ? self->digits[i] : UINT32_C(0);
 }
 
 static void onyxNaturalNormalize(OnyxInteger *self) {
@@ -92,7 +93,8 @@ static int onyxNaturalCmp(const OnyxInteger *lhs, const OnyxInteger *rhs) {
 
     if (l > r) {
       return 1;
-    } else if (l < r) {
+    }
+    if (l < r) {
       return -1;
     }
   }
@@ -377,15 +379,14 @@ static void onyxIntegerCopy(OnyxInteger *self, const OnyxInteger *other, AgateVM
 }
 
 static int onyxIntegerCmp(const OnyxInteger *lhs, const OnyxInteger *rhs) {
-  if (onyxNaturalCmpZero(lhs) && onyxNaturalCmpZero(rhs)) {
-    return 0;
-  }
-
   int cmp = onyxNaturalCmp(lhs, rhs);
 
   if (lhs->positive) {
     if (rhs->positive) {
       return cmp;
+    }
+    if (onyxNaturalCmpZero(lhs) && onyxNaturalCmpZero(rhs)) {
+      return 0;
     }
     return 1;
   }
@@ -393,7 +394,9 @@ static int onyxIntegerCmp(const OnyxInteger *lhs, const OnyxInteger *rhs) {
   if (!rhs->positive) {
     return -cmp;
   }
-
+  if (onyxNaturalCmpZero(lhs) && onyxNaturalCmpZero(rhs)) {
+    return 0;
+  }
   return -1;
 }
 
