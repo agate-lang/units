@@ -853,6 +853,7 @@ static void agateIntegerToS(AgateVM *vm) {
   ptrdiff_t size = 0;
 
   OnyxInteger copy;
+  onyxIntegerCreateEmpty(&copy);
   onyxIntegerCopy(&copy, integer, vm);
 
   while (onyxNaturalCmpZero(&copy) > 0) {
@@ -910,8 +911,6 @@ AgateForeignClassHandler agateMathBigClassHandler(AgateVM *vm, const char *unit_
 
 AgateForeignMethodFunc agateMathBigMethodHandler(AgateVM *vm, const char *unit_name, const char *class_name, AgateForeignMethodKind kind, const char *signature) {
   assert(agateEquals(unit_name, "math/big"));
-
-  printf("Hello! unit_name: '%s', class_name: '%s', kind: %i, signature: '%s'\n", unit_name, class_name, kind, signature);
 
   if (agateEquals(class_name, "Integer")) {
     if (kind == AGATE_FOREIGN_METHOD_INSTANCE) {

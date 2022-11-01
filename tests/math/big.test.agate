@@ -1,4 +1,4 @@
-import "math/big" for BigInteger, BigNatural
+import "math/big" for Integer
 import "test" for TestSuite
 
 def random_natural(random) {
@@ -7,44 +7,44 @@ def random_natural(random) {
   for (i in 0...size) {
     digits[i] = ('0'.to_i + random.int(10)).to_c
   }
-  return BigNatural.new(digits.join().ltrim("0"))
+  return Integer.new(digits.join().ltrim("0"))
 }
 
-TestSuite.new("BigNatural") {|suite|
+TestSuite.new("Integer") {|suite|
   #
   # New
   #
 
   suite.case("NewEmpty") {|case|
-    def n = BigNatural.new()
+    def n = Integer.new()
     case.expect_true(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 0)
   }
 
   suite.case("NewFromInt") {|case|
-    def n = BigNatural.new(42)
+    def n = Integer.new(42)
     case.expect_false(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 42)
   }
 
   suite.case("NewFromStringZero") {|case|
-    def n = BigNatural.new("0")
+    def n = Integer.new("0")
     case.expect_true(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 0)
   }
 
   suite.case("NewFromStringZeroes") {|case|
-    def n = BigNatural.new("0000000")
+    def n = Integer.new("0000000")
     case.expect_true(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 0)
   }
 
   suite.case("NewFromStringDecDigit") {|case|
-    def n = BigNatural.new("42")
+    def n = Integer.new("42")
     case.expect_false(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 42)
@@ -52,7 +52,7 @@ TestSuite.new("BigNatural") {|suite|
   }
 
   suite.case("NewFromStringAllDecDigit") {|case|
-    def n = BigNatural.new("0123456789")
+    def n = Integer.new("0123456789")
     case.expect_false(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 123456789)
@@ -60,7 +60,7 @@ TestSuite.new("BigNatural") {|suite|
   }
 
   suite.case("NewFromStringHexDigit") {|case|
-    def n = BigNatural.new("29A", 16)
+    def n = Integer.new("29A", 16)
     case.expect_false(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 0x29A)
@@ -68,14 +68,14 @@ TestSuite.new("BigNatural") {|suite|
   }
 
   suite.case("NewFromStringAllHexDigit") {|case|
-    def n = BigNatural.new("0123456789ABCDEFabcdef", 16)
+    def n = Integer.new("0123456789ABCDEFabcdef", 16)
     case.expect_false(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n.to_s(16), "123456789ABCDEFABCDEF")
   }
 
   suite.case("NewFromStringWithZero") {|case|
-    def n = BigNatural.new("0000000000000042")
+    def n = Integer.new("0000000000000042")
     case.expect_false(n.is_zero)
     case.expect_true(n.positive)
     case.expect_equals(n, 42)
@@ -86,26 +86,26 @@ TestSuite.new("BigNatural") {|suite|
   #
 
   suite.case("CmpSame") {|case|
-    def n = BigNatural.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
+    def n = Integer.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
     case.expect_true(n.cmp(n) == 0)
   }
 
   suite.case("CmpEqual") {|case|
-    def n1 = BigNatural.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
-    def n2 = BigNatural.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
+    def n1 = Integer.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
+    def n2 = Integer.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
     case.expect_true(n1.cmp(n2) == 0)
   }
 
   suite.case("CmpSameSizeDifferent") {|case|
-    def n1 = BigNatural.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
-    def n2 = BigNatural.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F1", 16)
+    def n1 = Integer.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
+    def n2 = Integer.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F1", 16)
     case.expect_true(n1.cmp(n2) > 0)
     case.expect_true(n2.cmp(n1) < 0)
   }
 
   suite.case("CmpDifferentSize") {|case|
-    def n1 = BigNatural.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
-    def n2 = BigNatural.new(42)
+    def n1 = Integer.new("E38C3BA948CDEA5673926BFFDBAECBF782B3F2C332F1C3F2", 16)
+    def n2 = Integer.new(42)
     case.expect_true(n1.cmp(n2) > 0)
     case.expect_true(n2.cmp(n1) < 0)
   }
@@ -115,15 +115,15 @@ TestSuite.new("BigNatural") {|suite|
   #
 
   suite.case("AddSingleDigit") {|case|
-    def n1 = BigNatural.new(1234)
-    def n2 = BigNatural.new(5678)
+    def n1 = Integer.new(1234)
+    def n2 = Integer.new(5678)
     def n3 = n1 + n2
     case.expect_equals(n3, 6912)
   }
 
   suite.case("AddManyDigits") {|case|
-    def n1 = BigNatural.new("123456789012345678901234567890")
-    def n2 = BigNatural.new("987654321098765432109876543210")
+    def n1 = Integer.new("123456789012345678901234567890")
+    def n2 = Integer.new("987654321098765432109876543210")
     def n3 = n1 + n2
     case.expect_equals(n3, "1111111110111111111011111111100")
     def n4 = n2 + n1
@@ -131,12 +131,12 @@ TestSuite.new("BigNatural") {|suite|
   }
 
   suite.case("AddManyDigitsWithCarry") {|case|
-    def n1 = BigNatural.new("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16)
-    def n2 = BigNatural.new(1)
+    def n1 = Integer.new("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16)
+    def n2 = Integer.new(1)
     def n3 = n1 + n2
-    case.expect_equals(n3, BigNatural.new("100000000000000000000000000000000", 16))
+    case.expect_equals(n3, Integer.new("100000000000000000000000000000000", 16))
     def n4 = n2 + n1
-    case.expect_equals(n4, BigNatural.new("100000000000000000000000000000000", 16))
+    case.expect_equals(n4, Integer.new("100000000000000000000000000000000", 16))
   }
 
   #
@@ -144,24 +144,24 @@ TestSuite.new("BigNatural") {|suite|
   #
 
   suite.case("SubSingleDigit") {|case|
-    def n1 = BigNatural.new(1234)
-    def n2 = BigNatural.new(5678)
+    def n1 = Integer.new(1234)
+    def n2 = Integer.new(5678)
     def n3 = n2 - n1
     case.expect_equals(n3, 4444)
   }
 
   suite.case("SubManyDigits") {|case|
-    def n1 = BigNatural.new("123456789012345678901234567890")
-    def n2 = BigNatural.new("987654321098765432109876543210")
+    def n1 = Integer.new("123456789012345678901234567890")
+    def n2 = Integer.new("987654321098765432109876543210")
     def n3 = n2 - n1
     case.expect_equals(n3, "864197532086419753208641975320")
   }
 
   suite.case("SubManyDigitsWithCarry") {|case|
-    def n1 = BigNatural.new("100000000000000000000000000000000", 16)
-    def n2 = BigNatural.new(1)
+    def n1 = Integer.new("100000000000000000000000000000000", 16)
+    def n2 = Integer.new(1)
     def n3 = n1 - n2
-    case.expect_equals(n3, BigNatural.new("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16))
+    case.expect_equals(n3, Integer.new("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16))
   }
 
   #
@@ -169,16 +169,16 @@ TestSuite.new("BigNatural") {|suite|
   #
 
   suite.case("MulSingleDigit") {|case|
-    def n1 = BigNatural.new(42)
-    def n2 = BigNatural.new(69)
+    def n1 = Integer.new(42)
+    def n2 = Integer.new(69)
     def n3 = n1 * n2
     case.expect_equals(n3, 2898)
   }
 
   suite.case("MulManyDigit") {|case|
-    def n1 = BigNatural.new("69426942694269")
-    def n2 = BigNatural.new("12")
-    def n3 = BigNatural.new("833123312331228")
+    def n1 = Integer.new("69426942694269")
+    def n2 = Integer.new("12")
+    def n3 = Integer.new("833123312331228")
 
     def n4 = n1 * n2
     case.expect_equals(n3, n4)
@@ -187,18 +187,18 @@ TestSuite.new("BigNatural") {|suite|
   }
 
   suite.case("Mul64") {|case|
-    def n1 = BigNatural.new("FFFFFFFFFFFFFFFF", 16)
-    def n2 = BigNatural.new("FFFFFFFFFFFFFFFF", 16)
+    def n1 = Integer.new("FFFFFFFFFFFFFFFF", 16)
+    def n2 = Integer.new("FFFFFFFFFFFFFFFF", 16)
     def n3 = n1 * n2
-    def n4 = BigNatural.new("fffffffffffffffe0000000000000001", 16)
+    def n4 = Integer.new("fffffffffffffffe0000000000000001", 16)
     case.expect_equals(n3, n4)
   }
 
   suite.case("MulRsa768") {|case|
-    def n1 = BigNatural.new("d982ec7b440e2869d2535e51f91bacc3eb6eba042e106e6f875c3d17e53db65fffd6e4e9a36084ce60f83d754dd7f701", 16)
-    def n2 = BigNatural.new("eebe6dd23ce7e99c0e2249fecc4418c34af74e418bfa714c3791828414ab18f32fd7e093062a49b030225cc845f99ab5", 16)
+    def n1 = Integer.new("d982ec7b440e2869d2535e51f91bacc3eb6eba042e106e6f875c3d17e53db65fffd6e4e9a36084ce60f83d754dd7f701", 16)
+    def n2 = Integer.new("eebe6dd23ce7e99c0e2249fecc4418c34af74e418bfa714c3791828414ab18f32fd7e093062a49b030225cc845f99ab5", 16)
     def n3 = n1 * n2
-    def n4 = BigNatural.new("cad984557c97e039431a226ad727f0c6d43ef3d418469f1b375049b229843ee9f83b1f97738ac274f5f61f401f21f1913e4b64bb31b55a38d398c0dfed00b1392f0889711c44b359e7976c617fcc734f06e3e95c26476091b52f462e79413db5", 16)
+    def n4 = Integer.new("cad984557c97e039431a226ad727f0c6d43ef3d418469f1b375049b229843ee9f83b1f97738ac274f5f61f401f21f1913e4b64bb31b55a38d398c0dfed00b1392f0889711c44b359e7976c617fcc734f06e3e95c26476091b52f462e79413db5", 16)
 
     case.expect_equals(n3, n4)
   }
@@ -214,54 +214,54 @@ TestSuite.new("BigNatural") {|suite|
   #
 
   suite.case("ExpXZero") {|case|
-    def n1 = BigNatural.new("1234567890ABCDEF", 16)
-    def n2 = BigNatural.new("0")
-    def n3 = BigNatural.exp(n1, n2)
+    def n1 = Integer.new("1234567890ABCDEF", 16)
+    def n2 = Integer.new("0")
+    def n3 = Integer.exp(n1, n2)
     case.expect_equals(n3, 1)
   }
 
   suite.case("ExpXOne") {|case|
-    def n1 = BigNatural.new("1234567890ABCDEF", 16)
-    def n2 = BigNatural.new("1")
-    def n3 = BigNatural.exp(n1, n2)
+    def n1 = Integer.new("1234567890ABCDEF", 16)
+    def n2 = Integer.new("1")
+    def n3 = Integer.exp(n1, n2)
     case.expect_equals(n3, n1)
   }
 
   suite.case("ExpZeroN") {|case|
-    def n1 = BigNatural.new("0")
-    def n2 = BigNatural.new("1234567890ABCDEF", 16)
-    def n3 = BigNatural.exp(n1, n2)
+    def n1 = Integer.new("0")
+    def n2 = Integer.new("1234567890ABCDEF", 16)
+    def n3 = Integer.exp(n1, n2)
     case.expect_equals(n3, 0)
   }
 
   suite.case("ExpOneN") {|case|
-    def n1 = BigNatural.new("1")
-    def n2 = BigNatural.new("1234567890ABCDEF", 16)
-    def n3 = BigNatural.exp(n1, n2)
+    def n1 = Integer.new("1")
+    def n2 = Integer.new("1234567890ABCDEF", 16)
+    def n3 = Integer.exp(n1, n2)
     case.expect_equals(n3, 1)
   }
 
   suite.case("ExpSmallSmall") {|case|
-    def n1 = BigNatural.new("31", 16)
-    def n2 = BigNatural.new("56", 16)
-    def n3 = BigNatural.new("7491caf9dd4e6cc7aa542df60f1437aad480c03e54f97e58230a7952097d3710e2c0af4562b67af9f8e46b8c40beaa50fadf46423471861e4efce4f21", 16)
-    def n4 = BigNatural.exp(n1, n2)
+    def n1 = Integer.new("31", 16)
+    def n2 = Integer.new("56", 16)
+    def n3 = Integer.new("7491caf9dd4e6cc7aa542df60f1437aad480c03e54f97e58230a7952097d3710e2c0af4562b67af9f8e46b8c40beaa50fadf46423471861e4efce4f21", 16)
+    def n4 = Integer.exp(n1, n2)
     case.expect_equals(n3, n4)
   }
 
   suite.case("ExpLargeSmall") {|case|
-    def n1 = BigNatural.new("123456789", 16)
-    def n2 = BigNatural.new("13", 16)
-    def n3 = BigNatural.new("b9def572bcd526c6bc46607dde0446ad6da1f4c4302fd57a1bec55d6157b328aeabe4525706f87494c647dca5fd70e1c33bbc93a4291fcf0eb957d7262a84b96148baee40ed8836bbeef433d9", 16)
-    def n4 = BigNatural.exp(n1, n2)
+    def n1 = Integer.new("123456789", 16)
+    def n2 = Integer.new("13", 16)
+    def n3 = Integer.new("b9def572bcd526c6bc46607dde0446ad6da1f4c4302fd57a1bec55d6157b328aeabe4525706f87494c647dca5fd70e1c33bbc93a4291fcf0eb957d7262a84b96148baee40ed8836bbeef433d9", 16)
+    def n4 = Integer.exp(n1, n2)
     case.expect_equals(n3, n4)
   }
 
   suite.case("ExpSmallLarge") {|case|
-    def n1 = BigNatural.new("10")
-    def n2 = BigNatural.new("1000")
-    def n3 = BigNatural.new("1" + "0" * 1000)
-    def n4 = BigNatural.exp(n1, n2)
+    def n1 = Integer.new("10")
+    def n2 = Integer.new("1000")
+    def n3 = Integer.new("1" + "0" * 1000)
+    def n4 = Integer.exp(n1, n2)
     case.expect_equals(n3, n4)
   }
 
@@ -270,24 +270,24 @@ TestSuite.new("BigNatural") {|suite|
   #
 
   suite.case("GcdCoprime") {|case|
-    def n1 = BigNatural.new("1533918542734615245164352154619195752815244561235899341531")
-    def n2 = BigNatural.new("1533918542734615245164352154619195752815244561235899341532")
-    def n3 = BigNatural.gcd(n1, n2)
+    def n1 = Integer.new("1533918542734615245164352154619195752815244561235899341531")
+    def n2 = Integer.new("1533918542734615245164352154619195752815244561235899341532")
+    def n3 = Integer.gcd(n1, n2)
     case.expect_equals(n3, 1)
   }
 
   suite.case("GcdRsa768") {|case|
-    def n1 = BigNatural.new("d982ec7b440e2869d2535e51f91bacc3eb6eba042e106e6f875c3d17e53db65fffd6e4e9a36084ce60f83d754dd7f701", 16)
-    def n2 = BigNatural.new("eebe6dd23ce7e99c0e2249fecc4418c34af74e418bfa714c3791828414ab18f32fd7e093062a49b030225cc845f99ab5", 16)
-    def n3 = BigNatural.gcd(n1, n2)
+    def n1 = Integer.new("d982ec7b440e2869d2535e51f91bacc3eb6eba042e106e6f875c3d17e53db65fffd6e4e9a36084ce60f83d754dd7f701", 16)
+    def n2 = Integer.new("eebe6dd23ce7e99c0e2249fecc4418c34af74e418bfa714c3791828414ab18f32fd7e093062a49b030225cc845f99ab5", 16)
+    def n3 = Integer.gcd(n1, n2)
     case.expect_equals(n3, 1)
   }
 
   suite.case("GcdCoprime") {|case|
-    def n1 = BigNatural.new("829029200588685010168228367991253899050528829049")
-    def n2 = BigNatural.new("92196793900174799975899442851691027900097961")
-    def n3 = BigNatural.new("97713221")
-    def n4 = BigNatural.gcd(n1, n2)
+    def n1 = Integer.new("829029200588685010168228367991253899050528829049")
+    def n2 = Integer.new("92196793900174799975899442851691027900097961")
+    def n3 = Integer.new("97713221")
+    def n4 = Integer.gcd(n1, n2)
     case.expect_equals(n3, n4)
   }
 
