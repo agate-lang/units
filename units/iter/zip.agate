@@ -33,8 +33,8 @@ class __Zip2 {
   }
 
   iterator_value(iterator) {
-    assert(iterator is Array)
-    assert(iterator.size == 2)
+    assert(iterator is Array, "Invalid iterator")
+    assert(iterator.size == 2, "Invalid iterator")
     def value0 = @seq0.iterator_value(iterator[0])
     def value1 = @seq1.iterator_value(iterator[1])
     return [ value0, value1 ]
@@ -73,8 +73,8 @@ class __ZipAny {
   }
 
   iterator_value(iterator) {
-    assert(iterator is Array)
-    assert(iterator.size == @seqs.size)
+    assert(iterator is Array, "Invalid iterator")
+    assert(iterator.size == @seqs.size, "Invalid iterator")
     def value = []
     for (i in 0...@seqs.size) {
       value.append(@seqs[i].iterator_value(iterator[i]))

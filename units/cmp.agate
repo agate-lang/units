@@ -10,7 +10,7 @@ def __greater(a, b) { a > b }
 def __greater_or_equal(a, b) { a >= b }
 
 class Compare {
-  static is_comparable(obj) { Object.has_method(seq, "cmp(_)") }
+  static is_comparable(obj) { Object.has_method(obj, "cmp(_)") }
 
   static less { __less }
   static less_or_equal { __less_or_equal }

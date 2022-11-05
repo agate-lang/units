@@ -30,8 +30,8 @@ class __Enumerate {
   }
 
   iterator_value(iterator) {
-    assert(iterator is Array)
-    assert(iterator.size == 2)
+    assert(iterator is Array, "Invalid iterator")
+    assert(iterator.size == 2, "Invalid iterator")
     def value = @seq.iterator_value(iterator[1])
     return [ iterator[0], value ]
   }
