@@ -62,6 +62,7 @@ static void onyxNaturalEnsureCapacity(OnyxInteger *self, ptrdiff_t capacity, Aga
     self->capacity = capacity;
   }
 
+  assert(self->capacity >= capacity);
   self->digits = agateMemoryAllocate(vm, self->digits, self->capacity * sizeof(uint32_t));
 }
 
@@ -843,7 +844,7 @@ static void agateIntegerToS(AgateVM *vm) {
 
   int64_t base = agateSlotGetInt(vm, 1);
 
-  if (base <= 0 && base > 36) {
+  if (base <= 0 || base > 36) {
     // TODO: error
   }
 
