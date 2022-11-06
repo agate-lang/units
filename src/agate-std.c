@@ -1,8 +1,8 @@
-#include "agate_std.h"
+#include "agate-std.h"
 
-#include "support.h"
+#include "agate-support.h"
 
-#include "agate_math_big.h"
+#include "agate-math-big.h"
 
 void agateStdConfigureClassHandlers(AgateVM *vm) {
   agateExForeignClassAddHandler(vm, agateMathBigClassHandler, "math/big");

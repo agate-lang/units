@@ -1,4 +1,4 @@
-#include "agate_math_big.h"
+#include "agate-math-big.h"
 
 #include <assert.h>
 #include <inttypes.h>
@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "agate_tags.h"
+#include "agate-tags.h"
 
 static const uint64_t BASE = UINT64_C(0x100000000);
 
