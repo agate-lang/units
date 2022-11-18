@@ -3,10 +3,12 @@
 #
 # Heap, Priority queue
 
+def __default_heap_compare(a, b) { a < b }
+
 class Heap {
   construct new() {
     @data = []
-    @comp = Fn.new {|a,b| a < b }
+    @comp = __default_heap_compare
   }
 
   construct new(comp) {
@@ -68,7 +70,7 @@ class Heap {
     return res
   }
 
-  static sort(seq) { .sort(seq) {|a, b| a < b } }
+  static sort(seq) { .sort(seq, __default_heap_compare) }
 }
 
 class PriorityQueue is Heap {
