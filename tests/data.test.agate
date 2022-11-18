@@ -1,0 +1,2 @@
+import "tests/data/heap.test"
+import "tests/data/list.test"

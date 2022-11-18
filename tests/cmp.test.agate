@@ -1,0 +1,50 @@
+import "cmp" for Compare
+import "test" for TestSuite
+
+TestSuite.new("Compare") {|suite|
+  suite.case("IsComparableWhenComparable") {|case|
+    class C {
+      construct new() { }
+      cmp(other) { 0 }
+    }
+
+    case.expect_true(Compare.is_comparable(C.new()))
+  }
+
+  suite.case("IsComparableWhenNotComparable") {|case|
+    class C {
+      construct new() { }
+    }
+
+    case.expect_false(Compare.is_comparable(C.new()))
+  }
+
+  suite.case("Less") {|case|
+    def less = Compare.less
+    case.expect_false(less(42, 12))
+    case.expect_false(less(42, 42))
+    case.expect_true(less(42, 69))
+  }
+
+  suite.case("LessOrEqual") {|case|
+    def leq = Compare.less_or_equal
+    case.expect_false(leq(42, 12))
+    case.expect_true(leq(42, 42))
+    case.expect_true(leq(42, 69))
+  }
+
+  suite.case("Greater") {|case|
+    def greater = Compare.greater
+    case.expect_true(greater(42, 12))
+    case.expect_false(greater(42, 42))
+    case.expect_false(greater(42, 69))
+  }
+
+  suite.case("GreaterOrEqual") {|case|
+    def geq = Compare.greater_or_equal
+    case.expect_true(geq(42, 12))
+    case.expect_true(geq(42, 42))
+    case.expect_false(geq(42, 69))
+  }
+
+}

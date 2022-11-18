@@ -1,4 +1,6 @@
-import "tests/data/heap.test"
+import "tests/cmp.test"
+import "tests/iter.test"
+import "tests/data.test"
 import "tests/math/big.test"
 
 import "test" for TestSuite, ConsoleReporter

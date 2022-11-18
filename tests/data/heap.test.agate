@@ -16,6 +16,23 @@ TestSuite.new("Heap") {|suite|
     case.expect_equals(h.top, 42)
   }
 
+  suite.case("PushManyElement") {|case|
+    def h = Heap.new()
+    h.push(12)
+    h.push(69)
+    h.push(42)
+    case.expect_false(h.empty)
+    case.expect_equals(h.size, 3)
+    case.expect_equals(h.top, 69)
+    h.pop()
+    case.expect_equals(h.size, 2)
+    case.expect_equals(h.top, 42)
+    h.pop()
+    case.expect_equals(h.size, 1)
+    case.expect_equals(h.top, 12)
+    h.pop()
+    case.expect_true(h.empty)
+  }
 
   suite.case("Random") {|case|
     def random = Random.new(42)
@@ -30,6 +47,7 @@ TestSuite.new("Heap") {|suite|
     }
 
     array.sort()
+    array.reverse()
 
     for (x in array) {
       case.expect_false(h.empty)
@@ -39,4 +57,23 @@ TestSuite.new("Heap") {|suite|
 
     case.expect_true(h.empty)
   }
+
+  suite.case("Sort") {|case|
+    def arr = [ 7, 9, 2, 3, 8, 1, 5, 0, 4, 6 ]
+    def sorted = Heap.sort(arr)
+    case.expect_true(sorted.sorted())
+  }
+
+  suite.case("SortRandom") {|case|
+    def random = Random.new(42)
+    def array = []
+    for (i in 1..30) {
+      array.append(random.int(200))
+    }
+
+    def sorted = Heap.sort(array)
+    case.expect_true(sorted.sorted())
+  }
+
 }
+

@@ -24,7 +24,7 @@ class Heap {
     @data.append(item)
     while (i > 0) {
       def j = (i - 1) / 2
-      if (@comp(@data[j], @data[i])) {
+      if (@comp(@data[i], @data[j])) {
         return
       }
       @data.swap(i, j)
@@ -41,23 +41,21 @@ class Heap {
       assert(lt < @data.size, "lt")
       def rt = 2 * i + 2
       assert(rt < @data.size, "rt")
-      if (@comp(@data[i], @data[lt]) && @comp(@data[i], @data[rt])) {
+      if (@comp(@data[lt], @data[i]) && @comp(@data[rt], @data[i])) {
         break
       }
-      def j = @comp(@data[lt], @data[rt]) ? lt : rt
+      def j = @comp(@data[lt], @data[rt]) ? rt : lt
       @data.swap(i, j)
       i = j
     }
     @data.erase(-1)
   }
 
-  iterate(iterator) { @data.iterate(iterator) }
-  iterator_value(iterator) { @data.iterator_value(iterator) }
-
   to_a { @data[0..-1] }
+  to_s { "<%(@data.join(", "))>" }
 
   static sort(seq, comp) {
-    def h = Heap.new {|a,b| !comp(a,b) }
+    def h = Heap.new(comp)
     for (item in seq) {
       h.push(item)
     }
@@ -66,12 +64,11 @@ class Heap {
       res.append(h.top)
       h.pop()
     }
+    res.reverse()
     return res
   }
 
-  static sort(seq) {
-    .sort(seq) {|a, b| a < b }
-  }
+  static sort(seq) { .sort(seq) {|a, b| a < b } }
 }
 
 class PriorityQueue is Heap {
