@@ -9,30 +9,28 @@ class __Enumerate {
   }
 
   iterate(iterator) {
-    # TODO: use tuple when ready
-
     if (iterator == nil) {
       def it = @seq.iterate(nil)
       if (it == nil) {
         return nil
       }
-      return [ 0, it ]
+      return (0, it)
     }
 
-    assert(iterator is Array, "Invalid iterator")
+    assert(iterator is Tuple, "Invalid iterator")
     assert(iterator.size == 2, "Invalid iterator")
 
     def it = @seq.iterate(iterator[1])
     if (it == nil) {
       return nil
     }
-    return [ iterator[0] + 1, it ]
+    return (iterator[0] + 1, it)
   }
 
   iterator_value(iterator) {
-    assert(iterator is Array, "Invalid iterator")
+    assert(iterator is Tuple, "Invalid iterator")
     assert(iterator.size == 2, "Invalid iterator")
     def value = @seq.iterator_value(iterator[1])
-    return [ iterator[0], value ]
+    return (iterator[0], value)
   }
 }
