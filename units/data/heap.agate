@@ -16,10 +16,17 @@ class Heap {
     @comp = comp
   }
 
+  construct __new(data, comp) {
+    @data = data
+    @comp = comp
+  }
+
+  clear() { @data.clear() }
+  clone() { Heap.__new(@data.clone(), @comp) }
   empty { @data.empty }
   size { @data.size }
 
-  top { @data[0] }
+  peek() { @data[0] }
 
   push(item) {
     def i = @data.size
@@ -54,7 +61,7 @@ class Heap {
   }
 
   to_a { @data[0..-1] }
-  to_s { "<%(@data.join(", "))>" }
+  to_s { @data.to_s }
 
   static sort(seq, comp) {
     def h = Heap.new(comp)
@@ -63,7 +70,7 @@ class Heap {
     }
     def res = []
     while (!h.empty) {
-      res.append(h.top)
+      res.append(h.peek())
       h.pop()
     }
     res.reverse()
@@ -73,7 +80,36 @@ class Heap {
   static sort(seq) { .sort(seq, __default_heap_compare) }
 }
 
-class PriorityQueue is Heap {
-  construct new() { super() }
-  construct new(comp) { super(comp) }
+class __PriorityQueueElement {
+  construct new(item, priority) {
+    @item = item
+    @priority = priority
+  }
+
+  item { @item }
+  priority { @priority }
+}
+
+class PriorityQueue {
+  construct new() {
+    @heap = Heap.new {|a, b| a.priority < b.priority }
+  }
+
+  construct __new(heap) {
+    @heap = heap
+  }
+
+  clear() { @heap.clear() }
+  clone() { PriorityQueue.__new(@heap.clone()) }
+  empty { @heap.empty }
+  size { @heap.size }
+
+  peek() { @heap.peek().item }
+
+  push(item, priority) {
+    def data = __PriorityQueueElement.new(item, priority)
+    @heap.push(data)
+  }
+
+  pop() { @heap.pop() }
 }

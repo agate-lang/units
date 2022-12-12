@@ -13,7 +13,7 @@ TestSuite.new("Heap") {|suite|
     h.push(42)
     case.expect_false(h.empty)
     case.expect_equals(h.size, 1)
-    case.expect_equals(h.top, 42)
+    case.expect_equals(h.peek(), 42)
   }
 
   suite.case("PushManyElement") {|case|
@@ -23,13 +23,13 @@ TestSuite.new("Heap") {|suite|
     h.push(42)
     case.expect_false(h.empty)
     case.expect_equals(h.size, 3)
-    case.expect_equals(h.top, 69)
+    case.expect_equals(h.peek(), 69)
     h.pop()
     case.expect_equals(h.size, 2)
-    case.expect_equals(h.top, 42)
+    case.expect_equals(h.peek(), 42)
     h.pop()
     case.expect_equals(h.size, 1)
-    case.expect_equals(h.top, 12)
+    case.expect_equals(h.peek(), 12)
     h.pop()
     case.expect_true(h.empty)
   }
@@ -51,7 +51,7 @@ TestSuite.new("Heap") {|suite|
 
     for (x in array) {
       case.expect_false(h.empty)
-      case.expect_equals(x, h.top)
+      case.expect_equals(x, h.peek())
       h.pop()
     }
 
